@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    {% if user.is_authenticated %}
+    <div class="w-full p-10 bg-indigo-500 text-white">
+        <h1 class="text-4xl mb-5">Welcome {{ user.get_full_name }}!</h1>
+        {% lorem 1 p %}
+    </div>
+    {% endif %}
+{% endblock body %}

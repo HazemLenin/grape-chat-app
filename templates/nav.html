@@ -1,0 +1,33 @@
+<nav class="flex justify-between items-center px-20 py-5 bg-slate-100 text-gray-500">
+    <ul class="flex justify-between items-center gap-5">
+        <li>
+            <a href="{% url 'core:home' %}" class="text-2xl text-indigo-500 font-bold">Grape</a>
+        </li>
+        <li>
+            <a href="{% url 'users:users' %}"{% if request.path == '/users/' %} class="text-black"{% endif %}>Users</a>
+        </li>
+        {% if user.is_authenticated %}
+        <li>
+            <a href="{% url 'rooms:rooms' %}"{% if request.path == '/rooms/' %} class="text-black"{% endif %}>Rooms</a>
+        </li>
+        {% endif %}
+    </ul>
+    
+    <ul class="flex justify-between items-center gap-5">
+        {% if user.is_authenticated %}
+            <li>
+                <a href="{% url 'users:user' user.pk %}">{{ user.username }}</a>
+            </li>
+            <li>
+                <a href="{% url 'logout' %}">Logout</a>
+            </li>
+        {% else %}
+            <li>
+                <a href="{% url 'users:user-signup' %}"{% if request.path == '/users/singup/' %} class="text-black"{% endif %}>Signup</a>
+            </li>
+            <li>
+                <a href="{% url 'login' %}"{% if request.path == '/login/' %} class="text-black"{% endif %}>Login</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>

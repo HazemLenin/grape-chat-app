@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %} - {{ room.title }}{% endblock title %}
+
+{% block body %}
+    <div class="flex justify-between items-center mb-5">
+        <h1 class="text-4xl">{{ room.title }}</h1>
+        <div class="flex justify-between items-center gap-10">
+            {% if room.creator == user or user.is_admin %}
+            <a href="{% url 'rooms:room-delete' room.pk %}" class="w-40 block bg-red-500 hover:bg-red-600 rounded p-2 text-white text-center">Delete</a>
+            {% endif %}
+            {% if room.creator ==  user %}
+                <a href="{% url 'rooms:room-edit' room.pk %}" class="w-40 block bg-indigo-500 hover:bg-indigo-600 rounded p-2 text-white text-center">Edit</a>
+            {% endif %}
+        </div>
+    </div>
+    <table class="w-full">
+        <tbody>
+            <tr>
+                <td>Title</td>
+                <td>{{ room.title }}</td>
+            </tr>
+            <tr>
+                <td>Creator</td>
+                <td>{{ room.creator.username }}</td>
+            </tr>
+            <tr>
+                <td>Created at</td>
+                <td>{{ room.created }}</td>
+            </tr>
+            <tr>
+                <td>Members</td>
+                <td>{{ room.members.count }}</td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock body %}

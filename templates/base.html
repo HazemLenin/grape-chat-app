@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grape{% block title %} Chat App{% endblock title %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    {% include 'nav.html' %}
+    
+    <main>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li class="{% if message.tags %}{{ message.tags }} {% endif %}px-5 py-5
+        {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+            bg-teal-100 border-teal-600
+        {% elif message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+            bg-red-100 border-red-600
+        {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+            bg-sky-100 border-sky-600
+        {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+            bg-yellow-100 border-yellow-600
+        {% endif %} border-l-8">
+            {{ message }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+        <section class="px-40 pt-10">
+            {% block body %}{% endblock body %}
+        </secttion>
+    </main>
+    {% include 'footer.html' %}
+</body>
+</html>

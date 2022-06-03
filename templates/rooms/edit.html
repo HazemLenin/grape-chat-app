@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+
+{% block title %} - Edit {{ room.title }}{% endblock title %}
+
+{% block body %}
+    <h1 class="text-4xl">Edit {{ room.title }}</h1>
+    {% include 'form.html' %}
+{% endblock body %}

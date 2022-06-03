@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %} - Delete{% endblock title %}
+
+{% block body %}
+    <form method="post">
+        {% csrf_token %}
+        <h1 class="text-4xl mb-5">Delete {{ object }}?</h1>
+        <button type="submit" class="w-40 rounded bg-red-500 text-white py-2 hover:bg-red-600">Delete</button>
+    </form>
+{% endblock body %}

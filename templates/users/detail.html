@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %} - {{ object.username }}{% endblock title %}
+
+{% block body %}
+    <div class="flex justify-between items-center mb-5">
+        <h1 class="text-4xl">{{ object.username }}</h1>
+        <div class="flex justify-between items-center gap-10">
+            {% if object == user or user.is_admin %}
+            <a href="{% url 'users:user-delete' object.pk %}" class="w-40 block bg-red-500 hover:bg-red-600 rounded p-2 text-white text-center">Delete</a>
+            {% endif %}
+            {% if object ==  user %}
+                <a href="{% url 'users:user-edit' object.pk %}" class="w-40 block bg-indigo-500 hover:bg-indigo-600 rounded p-2 text-white text-center">Edit</a>
+            {% endif %}
+        </div>
+    </div>
+    <table class="w-full">
+        <tbody>
+            <tr>
+                <td>Username</td>
+                <td>{{ object.username }}</td>
+            </tr>
+            <tr>
+                <td>First Name</td>
+                <td>{{ object.first_name }}</td>
+            </tr>
+            <tr>
+                <td>Last Name</td>
+                <td>{{ object.last_name }}</td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td>{{ object.email }}</td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock body %}
