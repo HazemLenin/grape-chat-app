@@ -16,6 +16,7 @@
                 <th>title</th>
                 <th>Date Created</th>
                 <th>Members</th>
+                <th>Joined</th>
             </tr>
         </thead>
         <tbody>
@@ -26,6 +27,7 @@
                 </td>
                 <td class="border-2 border-slate-100">{{ room.created }}</td>
                 <td class="border-2 border-slate-100">{{ room.members.count }}</td>
+                <td class="border-2 border-slate-100">{{ user in room.members }}</td>
             </tr>
             {% endfor %}
         </tbody>

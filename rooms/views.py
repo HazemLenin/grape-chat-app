@@ -9,6 +9,7 @@ from core.models import Room, Membership
 class RoomListView(generic.ListView):
     model = Room
     template_name = 'rooms/list.html'
+    ordering = ['-id']
     paginate_by = 8
 
 

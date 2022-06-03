@@ -1,11 +1,11 @@
 from django.db import models
-from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 
-User = get_user_model()
-
+class User(AbstractUser):
+    email = models.EmailField(_("email address"), unique=True)
 
 class AbstractModel(models.Model):
     created = models.DateTimeField(_('created'), auto_now_add=True)
@@ -24,7 +24,7 @@ class Profile(AbstractModel):
 
 
 class Room(AbstractModel):
-    title = models.CharField(max_length=265)
+    title = models.CharField(max_length=265, unique=True)
     creator = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name='created_rooms')
     members = models.ManyToManyField(User, through='Membership', related_name='joined_rooms')
 

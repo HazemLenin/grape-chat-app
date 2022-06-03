@@ -15,12 +15,13 @@ class SignupView(SuccessMessageMixin, generic.CreateView):
     success_message = 'Thank you for registering!'
 
     def get_success_url(self):
-        return reverse('users:home')
+        return reverse('core:home')
 
 
 class UserListView(generic.ListView):
     model = User
     template_name = 'users/list.html'
+    ordering = ['-id']
     paginate_by = 8
 
 
