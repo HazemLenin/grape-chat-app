@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_tailwind',
     'debug_toolbar',
+    'channels',
     
     'core',
     'users',
@@ -79,6 +80,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'grape_chat_app.wsgi.application'
+ASGI_APPLICATION = 'grape_chat_app.asgi.application'
 
 
 # Database
@@ -146,8 +148,18 @@ STATICFILES_DIRS = [
     STATIC_DIR,
 ]
 
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 # MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 AUTH_USER_MODEL = 'core.User'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}

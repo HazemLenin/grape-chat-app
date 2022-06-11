@@ -5,13 +5,16 @@ from core.models import Profile
 
 User = get_user_model()
 
+
 class DateInput(forms.DateInput):
     input_type = 'date'
+
 
 class SignupForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email')
+
 
 class UserUpdateForm(UserChangeForm):
     class Meta:

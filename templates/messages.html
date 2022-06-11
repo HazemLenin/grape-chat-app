@@ -1,0 +1,18 @@
+{% if messages %}
+<ul class="messages-notify">
+    {% for message in messages %}
+    <li class="{% if message.tags %}{{ message.tags }} {% endif %}px-5 py-5
+    {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+        bg-teal-100 border-teal-600
+    {% elif message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+        bg-red-100 border-red-600
+    {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+        bg-sky-100 border-sky-600
+    {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+        bg-yellow-100 border-yellow-600
+    {% endif %} border-l-8">
+        {{ message }}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}

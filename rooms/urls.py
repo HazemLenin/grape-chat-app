@@ -9,4 +9,5 @@ urlpatterns = [
     path('<int:pk>/', views.RoomDetailView.as_view(), name='room'),
     path('<int:pk>/edit/', views.RoomUpdateView.as_view(), name='room-edit'),
     path('<int:pk>/delete/', views.RoomDeleteView.as_view(), name='room-delete'),
+    path('<int:pk>/join/', views.room_join, name='room-join'),
 ]

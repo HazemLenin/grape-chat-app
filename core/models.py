@@ -1,11 +1,14 @@
 from django.db import models
+from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
+
 
 # Create your models here.
 
 class User(AbstractUser):
     email = models.EmailField(_("email address"), unique=True)
+
 
 class AbstractModel(models.Model):
     created = models.DateTimeField(_('created'), auto_now_add=True)
@@ -32,6 +35,12 @@ class Room(AbstractModel):
         return self.title
 
 
+@receiver(models.signals.post_save, sender=Room)
+def room_created_receiver(sender, instance, **kwargs):
+    # creator = User.objects.get(sender.creator.id)
+    Membership.objects.create(user=instance.creator, room=instance, is_admin=True)
+
+
 class Membership(AbstractModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
@@ -43,7 +52,8 @@ class Membership(AbstractModel):
 
 class Message(AbstractModel):
     sender = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
-    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="messages")
+    text = models.TextField()
 
     def __str__(self):
-        return f'{self.user}\'s message'
+        return f'{self.sender}\'s message'

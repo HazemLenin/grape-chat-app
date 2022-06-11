@@ -1,7 +1,7 @@
 from django.shortcuts import render, reverse
 from django.views import generic
 from django.contrib.messages.views import SuccessMessageMixin
-from .forms import SignupForm, ProfileForm, UserUpdateForm
+from .forms import SignupForm, UserUpdateForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth import mixins
 
@@ -9,20 +9,21 @@ from django.contrib.auth import mixins
 
 User = get_user_model()
 
-class SignupView(SuccessMessageMixin, generic.CreateView):
-    form_class = SignupForm
-    template_name = 'registration/signup.html'
-    success_message = 'Thank you for registering!'
-
-    def get_success_url(self):
-        return reverse('core:home')
-
 
 class UserListView(generic.ListView):
     model = User
     template_name = 'users/list.html'
     ordering = ['-id']
     paginate_by = 8
+
+
+class UserSignupView(SuccessMessageMixin, generic.CreateView):
+    form_class = SignupForm
+    template_name = 'registration/signup.html'
+    success_message = 'Thank you for registering!'
+
+    def get_success_url(self):
+        return reverse('core:home')
 
 
 class UserDetailView(generic.DetailView):

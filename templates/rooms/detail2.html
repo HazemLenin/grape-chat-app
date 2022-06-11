@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Grape - {{ room.title }}</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            body {
+                display: grid;
+                height: 100vh;
+                width: 100%;
+                grid-template-areas:
+                    "nav nav"
+                    "messages main"
+                    "aside main"
+                    "aside main";
+                grid-template-rows: 4rem auto 1fr;
+                grid-template-columns: 3fr 7fr;
+            }
+
+            nav {
+                grid-area: nav;
+            }
+
+            aside {
+                grid-area: aside;
+                box-sizing: border-box;
+            }
+
+            main {
+                grid-area: main;
+            }
+
+            .messages-nofiy {
+                grid-area: messages;
+                width: 100%;
+            }
+
+        </style>
+    </head>
+    <body>
+        {% include 'nav.html' %}
+        {% include 'messages.html' %}
+        <aside class="p-2">
+            <table class="w-full mb-5">
+                <h1 class="text-4xl mb-5">{{ room.title }}</h1>
+                <tbody>
+                    <tr>
+                        <td>Creator</td>
+                        <td>{{ room.creator.username }}</td>
+                    </tr>
+                    <tr>
+                        <td>Created at</td>
+                        <td>{{ room.created }}</td>
+                    </tr>
+                    <tr>
+                        <td>Members</td>
+                        <td>{{ room.members.count }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            {% if user not in room.members.all %}
+                <a href="{% url 'rooms:room-join' room.pk %}" class="w-40 block bg-indigo-500 hover:bg-indigo-600 rounded p-2 text-white text-center">Join</a>
+            {% endif %}
+            <div class="flex justify-between items-center gap-10">
+                {% if room.creator == user or user.is_admin %}
+                    <a href="{% url 'rooms:room-delete' room.pk %}" class="w-40 block bg-red-500 hover:bg-red-600 rounded p-2 text-white text-center">Delete</a>
+                {% endif %}
+                {% if room.creator ==  user %}
+                    <a href="{% url 'rooms:room-edit' room.pk %}" class="w-40 block bg-indigo-500 hover:bg-indigo-600 rounded p-2 text-white text-center">Edit</a>
+                {% endif %}
+            </div>
+        </aside>
+        <main class="flex flex-col h-full bg-slate-400 px-2">
+            <ul class="w-full grow overflow-y-scroll scroll-smooth" id="messages-list">
+                {% for message in room.messages.all %}
+                    {% if message.sender == user %}
+                        <li class="w-1/2 my-2 ml-auto p-2 bg-slate-200 rounded-md">
+                            <p class="text-slate-500">
+                                {{ message.sender }}
+                            </p>
+                            <p class="text-black">
+                                {{ message.text }}
+                            </p>
+                        </li>
+                    {% else %}
+                        <li class="w-1/2 my-2 p-2 bg-slate-700 rounded-md">
+                            <p class="text-slate-400">
+                                {{ message.sender }}
+                            </p>
+                            <p class="text-slate-200">
+                                {{ message.text }}
+                            </p>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            {% if user in room.members.all %}
+                <form class="w-full h-30 shrink-0 flex justify-center items-center rounded-md overflow-hidden" id="message-form">
+                    <input class="block w-5/6 h-full bg=white p-2 outline-none" id="message-input">
+                    <button type="submit" class="block w-1/6 h-full bg-slate-600 hover:bg-slate-500 transition-all text-white p-4">Submit</button>
+                </form>
+            {% endif %}
+        </main>
+    </body>
+    {% if user in room.members.all %}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/reconnecting-websocket/1.0.0/reconnecting-websocket.min.js" integrity="sha512-B4skI5FiLurS86aioJx9VfozI1wjqrn6aTdJH+YQUmCZum/ZibPBTX55k5d9XM6EsKePDInkLVrN7vPmJxc1qA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            let message_form = document.getElementById('message-form');
+            let message_input = document.getElementById('message-input');
+            let messages_list = document.getElementById('messages-list');
+            messages_list.scrollTo(0, messages_list.scrollHeight);
+
+            function generate_message_li(message_data) {
+                if (message_data.username === "{{ user.username }}") {
+                    return `
+                        <li class="w-1/2 my-2 ml-auto p-2 bg-slate-200 rounded-md">
+                            <p class="text-slate-500">
+                                ${message_data.username}
+                            </p>
+                            <p class="text-black">
+                                ${message_data.text}
+                            </p>
+                        </li>
+                    `
+                }
+
+                return `
+                    <li class="w-1/2 my-2 p-2 bg-slate-700 rounded-md">
+                        <p class="text-slate-400">
+                            ${message_data.username}
+                        </p>
+                        <p class="text-slate-200">
+                            ${message_data.text}
+                        </p>
+                    </li>
+                `
+            }
+
+            message_form.onsubmit = e => {
+                e.preventDefault();
+                if (message_input.value !== "") {
+                    send_message(message_input.value);
+                    message_input.value = '';
+                }
+            }
+
+            let loc = window.location;
+            let wsProtocol = 'ws://';
+
+            if(loc.protocol == 'https:'){
+                wsProtocol = 'wss://'
+            }
+
+            let endpoint = wsProtocol + loc.host + loc.pathname;
+
+            let ws = new ReconnectingWebSocket(endpoint);
+
+            function send_message(text) {
+                let message = {
+                    "text": text
+                }
+                ws.send(JSON.stringify(message))
+            }
+
+            ws.onmessage = e => {
+                data = JSON.parse(e.data);
+                messages_list.innerHTML += generate_message_li(data);
+                messages_list.scrollTo(0, messages_list.scrollHeight);
+            }
+
+            ws.onclose = e => console.log('Websocket closed!')
+
+            // ws.onerror = e => console.log(e)
+        </script>
+    {% endif %}
+</html>

@@ -1,10 +1,10 @@
 from django.test import TestCase, Client
 from django.urls import reverse, resolve
 from users import views
-from users.forms import SignupForm
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
+
 
 class TestUsers(TestCase):
     def setUp(self):
@@ -17,60 +17,55 @@ class TestUsers(TestCase):
             'password2': 'hello%world'
         }
 
-        for i in range(100):
-            User.objects.create(username=f'username{i}', first_name='first_name', last_name='last_name', email=f'user{i}@email.com')
-            
+        data_copy = self.data.copy()
+
+        data_copy['password'] = 'hello%world'
+
+        del data_copy['password1']
+        del data_copy['password2']
+
+        User.objects.create(**data_copy)
+
     def test_users_list(self):
         c = Client()
-        response = c.get(reverse('users:users'))
+
+        users_url = reverse('users:users')
+        self.assertEqual(resolve(users_url).func.view_class, views.UserListView)
+
+        response = c.get(users_url)
         self.assertEqual(response.status_code, 200)
-        
-    def test_user_signup_and_user_detail_and_user_delete(self):
+
+    def test_user_signup(self):
         c = Client()
+        data_copy = self.data.copy()
 
-        response = c.get(reverse('users:user-signup'))
+        # change username and email for uniqueness
+        data_copy['username'] = 'newusername3'
+        data_copy['email'] = 'new3@example.com'
+
+        signup_url = reverse('users:user-signup')
+        self.assertEqual(resolve(signup_url).func.view_class, views.UserSignupView)
+
+        response = c.get(signup_url)
         self.assertEqual(response.status_code, 200)
 
-        response = c.post(reverse('users:user-signup'), self.data)
+        response = c.post(reverse('users:user-signup'), data_copy)
         self.assertEqual(response.status_code, 302)  # redirected
 
+    def test_user_detail(self):
         # user detail
-        response = c.get(reverse('users:user', kwargs={'pk': 1}))
+        user_url = reverse('users:user', kwargs={'pk': 1})
+        self.assertEqual(resolve(user_url).func.view_class, views.UserDetailView)
+
+        c = Client()
+        response = c.get(user_url)
         self.assertEqual(response.status_code, 200)
 
+    def test_user_delete(self):
         # user delete
-        response = c.post(reverse('users:user-delete', kwargs={'pk': 1}))
+        delete_user_url = reverse('users:user-delete', kwargs={'pk': 1})
+        self.assertEqual(resolve(delete_user_url).func.view_class, views.UserDeleteView)
+
+        c = Client()
+        response = c.post(delete_user_url)
         self.assertEqual(response.status_code, 302)  # redirected
-
-    def test_user_signup_form(self):
-        signup_form = SignupForm(self.data)
-        self.assertTrue(signup_form.is_valid())
-
-    def test_user_signup_form_required_fields(self):
-        dataCopy = self.data.copy()
-
-        del dataCopy['username']
-        del dataCopy['email']
-        del dataCopy['password1']
-        del dataCopy['password2']
-        
-        signup_form = SignupForm(dataCopy)
-        self.assertFalse(signup_form.is_valid())  # password validation error
-
-    def test_user_signup_form_password_validation(self):
-        dataCopy = self.data.copy()
-
-        dataCopy['password1'] = 'helloworld'
-        dataCopy['password2'] = 'helloworld'
-        
-        signup_form = SignupForm(dataCopy)
-        self.assertFalse(signup_form.is_valid())  # password validation error
-
-    def test_user_signup_form_passwords_matching(self):
-        dataCopy = self.data.copy()
-
-        dataCopy['password1'] = 'hello%world'
-        dataCopy['password2'] = 'helloworld123'
-        
-        signup_form = SignupForm(dataCopy)
-        self.assertFalse(signup_form.is_valid())  # password matching error
