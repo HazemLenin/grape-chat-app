@@ -35,10 +35,14 @@ Migration filed are already exist in core app. Just migrate the whole project:
 python manage.py migrate
 ```
 
-You can now run the app on localhost
+You can now run the app on localhost and start redis server
 
 ```cmd
 python manage.py runserver
+```
+
+```cmd
+redis-server
 ```
 
 Open http://localhost:8000 and voilla!
