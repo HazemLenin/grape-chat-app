@@ -29,7 +29,7 @@ virtualenv venv
 pip install -r requirements.txt
 ```
 
-Migration filed are already exist in core app. Just migrate the whole project:
+Migration files are already exist in core app. Just migrate the whole project:
 
 ```cmd
 python manage.py migrate
